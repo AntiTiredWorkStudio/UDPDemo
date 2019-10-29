@@ -44,28 +44,39 @@ namespace UDP
         static void ReciveFunc()
         {
             int port = 8001;
-            IPAddress remoteIp = IPAddress.Parse("127.0.0.1");
-            IPEndPoint local = new IPEndPoint(remoteIp, 8001);
+            string hostName = Dns.GetHostName();
+            IPHostEntry localhost = Dns.GetHostEntry(hostName);
+            IPAddress remoteIp = (
+                new List<IPAddress>(
+                    from IPAddress tip in localhost.AddressList 
+                    where tip.AddressFamily == AddressFamily.InterNetwork 
+                    select tip)
+                 )[0];
+
+            IPEndPoint local = new IPEndPoint(remoteIp, port);
             UdpClient RecviceClient = null;
             while (true)
             {
                 try
                 {
                     RecviceClient = new UdpClient(local);
+                    Console.WriteLine("接收线程:"+local.ToString()+" 启动成功");
                     break;
                 }
                 catch
                 {
+                    Console.WriteLine("端口占用:" + local.ToString() + " 重置端口");
                     local.Port++;
                     continue;
                 }
             }
             IPEndPoint remote = new IPEndPoint(IPAddress.Any, 8001);
+            //IPEndPoint remote01 = new IPEndPoint(IPAddress.Any, 8002);
             while (true)
             {
                 try
                 {
-                    byte[] recivcedata = RecviceClient.Receive(ref remote);
+                    byte[] recivcedata = RecviceClient.Receive(ref remote); //RecviceClient.Receive(ref remote01);
                     string strMsg = System.Text.Encoding.UTF8.GetString(recivcedata, 0, recivcedata.Length);
                     Console.WriteLine(strMsg);
                 }
@@ -83,7 +94,7 @@ namespace UDP
             {
                 try
                 {
-                    SendClient = new UdpClient(0);
+                    SendClient = new UdpClient(new IPEndPoint(IPAddress.Any, 0));
                     break;
                 }
                 catch
@@ -92,8 +103,9 @@ namespace UDP
                     continue;
                 }
             }
-            IPAddress remoteIp = IPAddress.Parse("127.0.0.1");
-            IPEndPoint ip = new IPEndPoint(remoteIp, 8001);
+            IPAddress remoteIp = IPAddress.Parse("255.255.255.255");
+            IPEndPoint ip = new IPEndPoint(remoteIp, port);
+            Console.WriteLine("发送线程启动成功:"+ip.ToString());
             
             while (true)
             {
@@ -102,6 +114,7 @@ namespace UDP
                     string msg = Console.ReadLine();
 
                     byte[] msgBuff = System.Text.Encoding.UTF8.GetBytes(msg);
+                    SendClient.EnableBroadcast = true;//.Send(msgBuff, msgBuff.Length);
                     SendClient.Send(msgBuff, msgBuff.Length, ip);
                 }
                 catch (Exception ex)
