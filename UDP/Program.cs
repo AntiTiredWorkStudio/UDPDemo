@@ -46,14 +46,14 @@ namespace UDP
             int port = 8001;
             string hostName = Dns.GetHostName();
             IPHostEntry localhost = Dns.GetHostEntry(hostName);
-            IPAddress remoteIp = (
+            List<IPAddress> remoteIp = (
                 new List<IPAddress>(
                     from IPAddress tip in localhost.AddressList 
                     where tip.AddressFamily == AddressFamily.InterNetwork 
                     select tip)
-                 )[0];
-
-            IPEndPoint local = new IPEndPoint(remoteIp, port);
+                 );
+            int seek = 0;
+            IPEndPoint local = new IPEndPoint(remoteIp[seek], port);
             UdpClient RecviceClient = null;
             while (true)
             {
@@ -66,7 +66,10 @@ namespace UDP
                 catch
                 {
                     Console.WriteLine("端口占用:" + local.ToString() + " 重置端口");
-                    local.Port++;
+                    if (remoteIp.Count > 1)
+                    {
+                        local = new IPEndPoint(remoteIp[++seek], port);
+                    } else { local.Port++; }
                     continue;
                 }
             }
@@ -78,7 +81,9 @@ namespace UDP
                 {
                     byte[] recivcedata = RecviceClient.Receive(ref remote); //RecviceClient.Receive(ref remote01);
                     string strMsg = System.Text.Encoding.UTF8.GetString(recivcedata, 0, recivcedata.Length);
-                    Console.WriteLine(strMsg);
+                    DataStruct data = Newtonsoft.Json.JsonConvert.DeserializeObject<DataStruct>(strMsg);
+                    if(data.id != ID)
+                        Console.WriteLine(data.id+":"+data.msg);
                 }
                 catch
                 {
@@ -112,8 +117,10 @@ namespace UDP
                 try
                 {
                     string msg = Console.ReadLine();
-
-                    byte[] msgBuff = System.Text.Encoding.UTF8.GetBytes(msg);
+                    if(msg == "")continue;
+                    DataStruct data = new DataStruct();
+                    data.id = ID; data.msg = msg;
+                    byte[] msgBuff = System.Text.Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(data));
                     SendClient.EnableBroadcast = true;//.Send(msgBuff, msgBuff.Length);
                     SendClient.Send(msgBuff, msgBuff.Length, ip);
                 }
