@@ -4,3 +4,10 @@ F:\Project\UDP\UDP\obj\x86\Debug\UDP.exe
 F:\Project\UDP\UDP\obj\x86\Debug\UDP.pdb
 F:\Project\UDP\UDP\obj\x86\Debug\UDP.csprojResolveAssemblyReference.cache
 F:\Project\UDP\UDP\bin\Debug\Newtonsoft.Json.dll
+D:\桌面位置\UDPDemo\UDP\bin\Debug\UDP.exe
+D:\桌面位置\UDPDemo\UDP\bin\Debug\UDP.pdb
+D:\桌面位置\UDPDemo\UDP\bin\Debug\Newtonsoft.Json.dll
+D:\桌面位置\UDPDemo\UDP\obj\x86\Debug\UDP.csprojResolveAssemblyReference.cache
+D:\桌面位置\UDPDemo\UDP\obj\x86\Debug\UDP.csproj.CoreCompileInputs.cache
+D:\桌面位置\UDPDemo\UDP\obj\x86\Debug\UDP.exe
+D:\桌面位置\UDPDemo\UDP\obj\x86\Debug\UDP.pdb
