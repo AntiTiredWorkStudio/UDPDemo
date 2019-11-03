@@ -35,6 +35,11 @@ namespace UDP
         {
             Console.WriteLine(msg);
         }
+
+        string UDPHandle<string>.UserIDSetting()
+        {
+            return "";
+        }
     }
     
     class Program

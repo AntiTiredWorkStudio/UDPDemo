@@ -12,6 +12,7 @@ namespace UDP
 {
     public interface UDPHandle<T>
     {
+        string UserIDSetting();
         void Log(string msg);
         void DataTransport(DataTransfer<T> data);
     }
@@ -23,7 +24,7 @@ namespace UDP
     }
     
 
-    class UDPManager<T>
+    public class UDPManager<T>
     {
         public UDPManager(UDPHandle<T> handle)
         {
@@ -35,13 +36,13 @@ namespace UDP
         {
             if (TargetMsg != null) TargetMsg.Enqueue(msg);
         }
+        Thread sendThread = null;
+        Thread reciveThread = null;
         void InitManager(UDPHandle<T> handle)
         {
             handleObject = handle;
             handleObject.Log("用户:" + ID);
             TargetMsg = new Queue<T>();
-            Thread sendThread = null;
-            Thread reciveThread = null;
             reciveThread = new Thread(ReciveFunc);
             reciveThread.IsBackground = false;
             reciveThread.Start();
@@ -49,13 +50,34 @@ namespace UDP
             sendThread.IsBackground = false;
             sendThread.Start();
         }
-        
+        public void CloseManager()
+        {
+            try
+            {
+                sendThread.Abort();
+                reciveThread.Abort();
+            }
+            catch(Exception e)
+            {
+                handleObject.Log(e.ToString());
+            }
+        }
+
         string id = "nan";
         public string ID
         {
             get
             {
-                if (id == "nan") { Random rand = new Random(); id = "user_" + (1000000 + rand.Next() % 999999); }
+                string idSetting = handleObject.UserIDSetting();
+                if (id == "nan") {
+                    if(idSetting != "")
+                    {
+                        id = idSetting;
+                    }
+                    else { 
+                    Random rand = new Random(); id = "user_" + (1000000 + rand.Next() % 999999);
+                    }
+                }
                 return id;
             }
         }
