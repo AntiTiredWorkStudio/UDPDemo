@@ -1,0 +1,6 @@
+F:\Project\UDP\obj\x86\Debug\UDP.csprojResolveAssemblyReference.cache
+F:\Project\UDP\bin\Debug\ConsoleApplication.exe
+F:\Project\UDP\bin\Debug\ConsoleApplication.pdb
+F:\Project\UDP\bin\Debug\Newtonsoft.Json.dll
+F:\Project\UDP\obj\x86\Debug\ConsoleApplication.exe
+F:\Project\UDP\obj\x86\Debug\ConsoleApplication.pdb
