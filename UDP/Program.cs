@@ -9,8 +9,9 @@ using System.Net;
 using Newtonsoft;
 namespace UDP
 {
-    public class DataStruct
+    class UDPScene : UDPHandle<string>
     {
+<<<<<<< HEAD
         public string id;
         public string msg;
     }
@@ -56,6 +57,36 @@ namespace UDP
         public void Recived(string data)
         {
             Console.WriteLine(data);
+=======
+        UDPManager<string> chatManager;
+        public UDPScene()
+        {
+            chatManager = new UDPManager<string>(this) ;
+            Chat();
+        }
+
+        void Chat()
+        {
+            while (true)
+            {
+                chatManager.AddMsg(Console.ReadLine());
+            }
+        }
+
+        public void DataTransport(DataTransfer<string> data)
+        {
+            Console.WriteLine(data.id + ":" + data.data);
+        }
+
+        public void Log(string msg)
+        {
+            Console.WriteLine(msg);
+        }
+
+        string UDPHandle<string>.UserIDSetting()
+        {
+            return "";
+>>>>>>> c04c3f7b747218a59ca520e69da7b3a77ab95215
         }
     }
     
@@ -63,7 +94,11 @@ namespace UDP
     {
         static void Main(string[] args)
         {
+<<<<<<< HEAD
             UDPController controller = new UDPController();
+=======
+            new UDPScene();
+>>>>>>> c04c3f7b747218a59ca520e69da7b3a77ab95215
         }
 
     }
