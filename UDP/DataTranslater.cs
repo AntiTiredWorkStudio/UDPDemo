@@ -8,9 +8,9 @@ namespace UDPV1
     /// <summary>
     /// 类别转换器
     /// </summary>
-    /// <typeparam name="LOCAL"></typeparam>
-    /// <typeparam name="NET"></typeparam>
-    /// <typeparam name="OBJECT"></typeparam>
+    /// <typeparam name="LOCAL">本地数据</typeparam>
+    /// <typeparam name="NET">网络数据</typeparam>
+    /// <typeparam name="OBJECT">控制器(DYNAMIC_HANDLE类型)</typeparam>
     class DataTranslater<LOCAL,NET,OBJECT> where OBJECT: DataTranslater<LOCAL,NET,OBJECT>.DYNAMIC_HANDLE<LOCAL>
     {
         public interface DYNAMIC_HANDLE<LOCAL>{
@@ -81,6 +81,17 @@ namespace UDPV1
             LastLocalObject = default(LOCAL);
         }
 
+        /// <summary>
+        /// 获取类别转换器实例
+        /// </summary>
+        /// <typeparam name="LOCAL"></typeparam>
+        /// <typeparam name="NET"></typeparam>
+        /// <typeparam name="OBJECT"></typeparam>
+        /// <param name="tObject"></param>
+        /// <param name="localNetHandle"></param>
+        /// <param name="netLocalHandle"></param>
+        /// <param name="isDynamicChange"></param>
+        /// <returns></returns>
         public static DataTranslater<LOCAL, NET, OBJECT> TranslaterInstance<LOCAL, NET, OBJECT>(
             OBJECT tObject,
             LOCAL_TO_NET localNetHandle,
