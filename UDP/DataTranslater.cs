@@ -1,14 +1,14 @@
 ﻿using System;
 
-namespace UDPV1
+namespace UDP_v1
 {
     /// <summary>
     /// 类别转换器
     /// </summary>
-    /// <typeparam name="LOCAL">本地数据</typeparam>
-    /// <typeparam name="NET">网络数据</typeparam>
+    /// <typeparam name="LOCAL">本地析构数据模块(需要使用结构体控制)</typeparam>
+    /// <typeparam name="NET">网络数据（通常为Fields类型）</typeparam>
     /// <typeparam name="OBJECT">控制器(DYNAMIC_HANDLE类型)</typeparam>
-    class DataTranslater<LOCAL,NET>
+    public class DataTranslater<LOCAL,NET> where LOCAL:struct
     {
         public interface DYNAMIC_HANDLE{
             void SetDynamic(LOCAL data);
@@ -18,10 +18,12 @@ namespace UDPV1
         public delegate NET LOCAL_TO_NET(LOCAL tLocal);
         public delegate LOCAL NET_TO_LOCAL(NET tNet);
         public delegate bool IS_DYNAMIC_CHANGE(LOCAL New,LOCAL LAST);
-        
+        public delegate bool CONFIRM_NET(NET tNet);
+
         public LOCAL_TO_NET LocalToNetHandle;
         public NET_TO_LOCAL NetToLocalHandle;
         public IS_DYNAMIC_CHANGE IsDynamicChange;
+        public CONFIRM_NET ConfirmHandle;
         public DYNAMIC_HANDLE tOnlineObject;
 
 
@@ -42,6 +44,11 @@ namespace UDPV1
             NetToLocalHandle = netLocalHandle;
         }
 
+        public void Set(CONFIRM_NET confirmHandle)
+        {
+            ConfirmHandle = confirmHandle;
+        }
+
         public void Set(DYNAMIC_HANDLE tObject)  {
             tOnlineObject = tObject;
             LastLocalObject = tObject.GetDynamic();
@@ -55,9 +62,14 @@ namespace UDPV1
             LOCAL dynamicState = tOnlineObject.GetDynamic();
             if (IsDynamicChange(dynamicState, LastLocalObject))
             {
-                return LocalToNetHandle(dynamicState);
+                NET target = LocalToNetHandle(dynamicState);
+                if (!ConfirmHandle(target))
+                {
+                    throw new Exception("不符合ConfirmHandle中的规定类型");
+                }
+                return target;
             }else{
-                return default(NET);
+                return default;
             }
         }
 
@@ -67,6 +79,11 @@ namespace UDPV1
         /// <param name="netObject"></param>
         public void OnTranslater(NET netObject)
         {
+
+            if (!ConfirmHandle(netObject))
+            {
+                throw new Exception("不符合ConfirmHandle中的规定类型");
+            }
             LOCAL localObject = NetToLocalHandle(netObject);
             if (IsDynamicChange(LastLocalObject, localObject))
             {
@@ -75,32 +92,37 @@ namespace UDPV1
         }
 
         DataTranslater(){
-            LastLocalObject = default(LOCAL);
+            LastLocalObject = default;
         }
 
+
+
+
+
         /// <summary>
-        /// 获取类别转换器实例
+        /// 创建翻译器实例
         /// </summary>
-        /// <typeparam name="LOCAL"></typeparam>
-        /// <typeparam name="NET"></typeparam>
-        /// <typeparam name="OBJECT"></typeparam>
-        /// <param name="tObject"></param>
-        /// <param name="localNetHandle"></param>
-        /// <param name="netLocalHandle"></param>
-        /// <param name="isDynamicChange"></param>
+        /// <typeparam name="T">目标控制器</typeparam>
+        /// <param name="tObject">析构数据产生器</param>
+        /// <param name="localNetHandle">析构数据转为网络数据->原型: public delegate NET LOCAL_TO_NET(LOCAL tLocal);</param>
+        /// <param name="netLocalHandle">网络数据转为析构数据->原型: public delegate LOCAL NET_TO_LOCAL(NET tNet);</param>
+        /// <param name="confirmHandle">校验网络数据包->原型: public delegate bool CONFIRM_NET(NET tNet);</param>
+        /// <param name="isDynamicChange">校验析构数据是否产生变化->原型: public delegate bool IS_DYNAMIC_CHANGE(LOCAL New, LOCAL LAST);</param>
         /// <returns></returns>
         public static DataTranslater<LOCAL, NET> TranslaterInstance<T>(
-            DYNAMIC_HANDLE tObject,
+            T tObject,
             LOCAL_TO_NET localNetHandle,
             NET_TO_LOCAL netLocalHandle,
-            T isDynamicChange
-            ) where T:DYNAMIC_HANDLE
+            CONFIRM_NET confirmHandle,
+            IS_DYNAMIC_CHANGE isDynamicChange
+            ) where T : class,DYNAMIC_HANDLE
         {
             DataTranslater<LOCAL, NET> tTranslater = new DataTranslater<LOCAL, NET>();
             tTranslater.Set(tObject);
             tTranslater.Set(localNetHandle);
             tTranslater.Set(netLocalHandle);
             tTranslater.Set(isDynamicChange);
+            tTranslater.Set(confirmHandle);
             return tTranslater;
         }
     }
