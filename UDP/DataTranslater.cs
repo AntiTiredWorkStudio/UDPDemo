@@ -19,39 +19,56 @@ namespace UDP_v1
         public delegate LOCAL NET_TO_LOCAL(NET tNet);
         public delegate bool IS_DYNAMIC_CHANGE(LOCAL New,LOCAL LAST);
         public delegate bool CONFIRM_NET(NET tNet);
+        public delegate void Log(string log);
 
         public LOCAL_TO_NET LocalToNetHandle;
         public NET_TO_LOCAL NetToLocalHandle;
         public IS_DYNAMIC_CHANGE IsDynamicChange;
         public CONFIRM_NET ConfirmHandle;
+        public Log LogHandle;
         public DYNAMIC_HANDLE tOnlineObject;
 
 
         LOCAL LastLocalObject;
 
-        public void Set(IS_DYNAMIC_CHANGE isDynamicChange)
+        void SelfLog(string text)
+        {
+            if (LogHandle != null) { LogHandle(text); }
+        }
+
+        public DataTranslater<LOCAL, NET> Set(Log logHandle)
+        {
+            LogHandle = logHandle;
+            return this;
+        }
+
+        public DataTranslater<LOCAL, NET> Set(IS_DYNAMIC_CHANGE isDynamicChange)
         {
             IsDynamicChange = isDynamicChange;
+            return this;
         }
-
-        public void Set(LOCAL_TO_NET localNetHandle)
+        public DataTranslater<LOCAL, NET> Set(LOCAL_TO_NET localNetHandle)
         {
             LocalToNetHandle = localNetHandle;
+            return this;
         }
         
-        public void Set(NET_TO_LOCAL netLocalHandle)
+        public DataTranslater<LOCAL, NET> Set(NET_TO_LOCAL netLocalHandle)
         {
             NetToLocalHandle = netLocalHandle;
+            return this;
         }
 
-        public void Set(CONFIRM_NET confirmHandle)
+        public DataTranslater<LOCAL, NET> Set(CONFIRM_NET confirmHandle)
         {
             ConfirmHandle = confirmHandle;
+            return this;
         }
 
-        public void Set(DYNAMIC_HANDLE tObject)  {
+        public DataTranslater<LOCAL, NET> Set(DYNAMIC_HANDLE tObject)  {
             tOnlineObject = tObject;
             LastLocalObject = tObject.GetDynamic();
+            return this;
         }
 
         /// <summary>
@@ -63,6 +80,8 @@ namespace UDP_v1
             if (IsDynamicChange(dynamicState, LastLocalObject))
             {
                 NET target = LocalToNetHandle(dynamicState);
+                SelfLog(dynamicState.ToString());
+                LastLocalObject = dynamicState;
                 if (!ConfirmHandle(target))
                 {
                     throw new Exception("不符合ConfirmHandle中的规定类型");
@@ -79,7 +98,6 @@ namespace UDP_v1
         /// <param name="netObject"></param>
         public void OnTranslater(NET netObject)
         {
-
             if (!ConfirmHandle(netObject))
             {
                 throw new Exception("不符合ConfirmHandle中的规定类型");
