@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace UDPV1
 {
@@ -11,9 +8,9 @@ namespace UDPV1
     /// <typeparam name="LOCAL">本地数据</typeparam>
     /// <typeparam name="NET">网络数据</typeparam>
     /// <typeparam name="OBJECT">控制器(DYNAMIC_HANDLE类型)</typeparam>
-    class DataTranslater<LOCAL,NET,OBJECT> where OBJECT: DataTranslater<LOCAL,NET,OBJECT>.DYNAMIC_HANDLE<LOCAL>
+    class DataTranslater<LOCAL,NET>
     {
-        public interface DYNAMIC_HANDLE<LOCAL>{
+        public interface DYNAMIC_HANDLE{
             void SetDynamic(LOCAL data);
             LOCAL GetDynamic();
         }
@@ -25,7 +22,7 @@ namespace UDPV1
         public LOCAL_TO_NET LocalToNetHandle;
         public NET_TO_LOCAL NetToLocalHandle;
         public IS_DYNAMIC_CHANGE IsDynamicChange;
-        public OBJECT tOnlineObject;
+        public DYNAMIC_HANDLE tOnlineObject;
 
 
         LOCAL LastLocalObject;
@@ -45,7 +42,7 @@ namespace UDPV1
             NetToLocalHandle = netLocalHandle;
         }
 
-        public void Set(OBJECT tObject)  {
+        public void Set(DYNAMIC_HANDLE tObject)  {
             tOnlineObject = tObject;
             LastLocalObject = tObject.GetDynamic();
         }
@@ -92,14 +89,14 @@ namespace UDPV1
         /// <param name="netLocalHandle"></param>
         /// <param name="isDynamicChange"></param>
         /// <returns></returns>
-        public static DataTranslater<LOCAL, NET, OBJECT> TranslaterInstance<LOCAL, NET, OBJECT>(
-            OBJECT tObject,
+        public static DataTranslater<LOCAL, NET> TranslaterInstance<T>(
+            DYNAMIC_HANDLE tObject,
             LOCAL_TO_NET localNetHandle,
             NET_TO_LOCAL netLocalHandle,
-            IS_DYNAMIC_CHANGE isDynamicChange
-            ) where OBJECT : DataTranslater<LOCAL, NET, OBJECT>.DYNAMIC_HANDLE<LOCAL>
+            T isDynamicChange
+            ) where T:DYNAMIC_HANDLE
         {
-            DataTranslater<LOCAL, NET, OBJECT> tTranslater = new DataTranslater<LOCAL, NET, OBJECT>();
+            DataTranslater<LOCAL, NET> tTranslater = new DataTranslater<LOCAL, NET>();
             tTranslater.Set(tObject);
             tTranslater.Set(localNetHandle);
             tTranslater.Set(netLocalHandle);
