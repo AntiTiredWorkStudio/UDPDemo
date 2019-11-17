@@ -4,3 +4,7 @@ F:\Project\UDP\bin\Debug\ConsoleApplication.pdb
 F:\Project\UDP\bin\Debug\Newtonsoft.Json.dll
 F:\Project\UDP\obj\x86\Debug\ConsoleApplication.exe
 F:\Project\UDP\obj\x86\Debug\ConsoleApplication.pdb
+D:\桌面位置\UDPDemo\obj\x86\Debug\UDP.csprojResolveAssemblyReference.cache
+D:\桌面位置\UDPDemo\obj\x86\Debug\UDP.csproj.CoreCompileInputs.cache
+D:\桌面位置\UDPDemo\obj\x86\Debug\ConsoleApplication.exe
+D:\桌面位置\UDPDemo\obj\x86\Debug\ConsoleApplication.pdb
