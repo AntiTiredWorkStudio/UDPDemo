@@ -15,8 +15,8 @@ namespace UDP_v1
             LOCAL GetDynamic();
         }
 
-        public delegate NET LOCAL_TO_NET(LOCAL tLocal);
-        public delegate LOCAL NET_TO_LOCAL(NET tNet);
+        public delegate NET LOCAL_TO_NET(LOCAL tLocal,LOCAL tLast);
+        public delegate LOCAL NET_TO_LOCAL(NET tNet,LOCAL tLast);
         public delegate bool IS_DYNAMIC_CHANGE(LOCAL New,LOCAL LAST);
         public delegate bool CONFIRM_NET(NET tNet);
         public delegate void Log(string log);
@@ -79,7 +79,7 @@ namespace UDP_v1
             LOCAL dynamicState = tOnlineObject.GetDynamic();
             if (IsDynamicChange(dynamicState, LastLocalObject))
             {
-                NET target = LocalToNetHandle(dynamicState);
+                NET target = LocalToNetHandle(dynamicState,LastLocalObject);
                 SelfLog(dynamicState.ToString());
                 LastLocalObject = dynamicState;
                 if (!ConfirmHandle(target))
@@ -102,7 +102,7 @@ namespace UDP_v1
             {
                 throw new Exception("不符合ConfirmHandle中的规定类型");
             }
-            LOCAL localObject = NetToLocalHandle(netObject);
+            LOCAL localObject = NetToLocalHandle(netObject,LastLocalObject);
             if (IsDynamicChange(LastLocalObject, localObject))
             {
                 tOnlineObject.SetDynamic(localObject);
